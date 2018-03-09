@@ -6,7 +6,7 @@ var DIST_DIR = path.join(__dirname, "dist"),
 module.exports = {
   context: CLIENT_DIR,
 
-  entry: "./main.js",
+  entry: ["babel-polyfill", "./main.js"],
 
   output: {
     path: DIST_DIR,
