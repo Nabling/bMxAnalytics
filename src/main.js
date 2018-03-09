@@ -1,5 +1,6 @@
 require("file-loader?name=index.html!./index.html");
 import moment from "moment";
+import axios from "axios";
 
 import assetsSchema from "./schema/assets";
 import channelsSchema from "./schema/channels";
@@ -14,7 +15,16 @@ import ShowpadWebApi from "./showpad-web-api";
 import { joinsEventsChannels, joinsEventsDivisions } from "./schema/joins";
 const dateFormat = "Y-MM-DD HH:mm:ss";
 let showpadRequestor;
-// Define our Web Data Connector
+// class TestApi {
+//   fetchUsers(){
+//     return
+//   }
+// }
+//
+// const testApi = new TestApi()
+// testApi.fetchPeoples().
+const showpadAuthentication = new ShowpadAuthentication();
+
 (function() {
   var myConnector = tableau.makeConnector();
   // const showpadRequestor = new ShowpadRequestor();
@@ -22,8 +32,8 @@ let showpadRequestor;
     console.log("Initializing Web Data Connector. Phase is " + tableau.phase);
 
     // STEP 1 - WDC IS LOADED
-    if (!ShowpadAuthentication.hasTokens()) {
-      console.log("We do not have ShowpadAuthentication tokens available");
+    if (!showpadAuthentication.hasTokens()) {
+      console.log("We do not have showpadAuthentication tokens available");
       if (tableau.phase != tableau.phaseEnum.gatherDataPhase) {
         toggleUIState("signIn");
         var redirectToSignIn = function() {
@@ -34,7 +44,7 @@ let showpadRequestor;
         $("#signIn").click(redirectToSignIn);
         redirectToSignIn();
       } else {
-        tableau.abortForAuth("Missing ShowpadAuthentication!");
+        tableau.abortForAuth("Missing showpadAuthentication!");
       }
 
       // Early return here to avoid changing any other state
@@ -46,16 +56,19 @@ let showpadRequestor;
 
     // STEP 6 - TOKEN STORED IN TABLEAU PASSWORD
     console.log("Setting tableau.password to access_token and refresh tokens");
-    tableau.password = JSON.stringify(ShowpadAuthentication.getTokens());
+    tableau.password = JSON.stringify(showpadAuthentication.getTokens());
+    console.log(
+      "showpadAuthentication.getTokens()",
+      showpadAuthentication.getTokens()
+    );
+    const showpadApi = new ShowpadWebApi("biomerieux");
+    showpadApi.accessToken = showpadAuthentication.getTokens().access_token;
 
-    // const s = new ShowpadWebApi();
-    // s.accessToken = ShowpadAuthentication.getTokens().access_token;
-    //
-    // showpadRequestor = new ShowpadRequestor(
-    //   s,
-    //   tableau.connectionData,
-    //   tableau.reportProgress
-    // );
+    showpadRequestor = new ShowpadRequestor(
+      showpadApi,
+      tableau.connectionData,
+      tableau.reportProgress
+    );
 
     console.log("Calling initCallback");
     initCallback();
@@ -113,7 +126,7 @@ let showpadRequestor;
       assetsTable,
       channelsTable,
       divisionsTable,
-      eventsTable,
+      // eventsTable,
       userUsergroupsTable,
       usergroupsTable,
       usersTable
@@ -122,31 +135,99 @@ let showpadRequestor;
 
   myConnector.getData = function(table, doneCallback) {
     console.log("getData called for table " + table.tableInfo.id);
-    var tableFunctions = {
-      topArtists: showpadRequestor.getMyTopArtists.bind(showpadRequestor),
-      topTracks: showpadRequestor.getMyTopTracks.bind(showpadRequestor),
-      artists: showpadRequestor.getMySavedArtists.bind(showpadRequestor),
-      albums: showpadRequestor.getMySavedAlbums.bind(showpadRequestor),
-      tracks: showpadRequestor.getMySavedTracks.bind(showpadRequestor)
+    const tableFunctions = {
+      assets: showpadRequestor.fetchAssets(),
+      channels: showpadRequestor.fetchChannels(),
+      divisions: showpadRequestor.fetchDivisions(),
+      events: showpadRequestor.fetchEvents(),
+      userUsergroups: showpadRequestor.fetchUserUserGroups(),
+      usergroups: showpadRequestor.fetchUserGroups(),
+      users: showpadRequestor.fetchUsers()
     };
-
     if (!tableFunctions.hasOwnProperty(table.tableInfo.id)) {
       tableau.abortWithError("Unknown table ID: " + table.tableInfo.id);
       return;
     }
 
-    tableFunctions[table.tableInfo.id]().then(
-      function(rows) {
-        table.appendRows(rows);
-        doneCallback();
-      },
-      function(error) {
-        console.log("Error occured waiting for promises. Aborting");
-        tableau.abortWithError(error.toString());
-        doneCallback();
+    // extract the datetime field from the schema to convert the date time to
+    // supported format by Tableau
+    const dateTimeFields = table.tableInfo.columns.reduce((fields, field) => {
+      if (field.dataType === "datetime") {
+        fields.push(field.id);
       }
-    );
+      return fields;
+    }, []);
+
+    let tableData = [];
+    tableFunctions[table.tableInfo.id]
+      .then(response => {
+        return response;
+      })
+      .then(response => response.data.response.items)
+      .then(data => {
+        console.log("data", data);
+
+        data.forEach(item => {
+          dateTimeFields.forEach(dateTimeField => {
+            item[dateTimeField] = item[dateTimeField]
+              ? moment(item[dateTimeField]).format(dateFormat)
+              : "";
+          });
+          // console.log("item", item);
+          tableData.push(item);
+        });
+        table.appendRows(tableData);
+        doneCallback();
+      });
+
+    // axios
+    //   .get(showpadRequestor.showpadApi.buildUrl("/exports/users.json"), {
+    //     headers: {
+    //       Accept: "application/json",
+    //       Authorization: AuthStr
+    //     }
+    //   })
+    //   .then(response => response.data.response.items)
+    //   .then(data => {
+    //     // console.log("data", data);
+    //
+    //     data.forEach(item => {
+    //       dateTimeFields.forEach(dateTimeField => {
+    //         item[dateTimeField] = item[dateTimeField]
+    //           ? moment(item[dateTimeField]).format(dateFormat)
+    //           : "";
+    //       });
+    //       // console.log("item", item);
+    //       tableData.push(item);
+    //     });
+    //     console.log("tableData", tableData);
+    //     table.appendRows(tableData);
+    //     doneCallback();
+    //   });
   };
+
+  // myConnector.getData = function(table, doneCallback) {
+  //   console.log("getData called for table " + table.tableInfo.id);
+  //   var tableFunctions = {
+  //     topArtists: showpadRequestor.getMyTopArtists.bind(showpadRequestor),
+  //     topTracks: showpadRequestor.getMyTopTracks.bind(showpadRequestor),
+  //     artists: showpadRequestor.getMySavedArtists.bind(showpadRequestor),
+  //     albums: showpadRequestor.getMySavedAlbums.bind(showpadRequestor),
+  //     tracks: showpadRequestor.getMySavedTracks.bind(showpadRequestor)
+  //   };
+  //
+  //   tableFunctions[table.tableInfo.id]().then(
+  //     function(rows) {
+  //       table.appendRows(rows);
+  //       doneCallback();
+  //     },
+  //     function(error) {
+  //       console.log("Error occured waiting for promises. Aborting");
+  //       tableau.abortWithError(error.toString());
+  //       doneCallback();
+  //     }
+  //   );
+  // };
 
   tableau.registerConnector(myConnector);
 

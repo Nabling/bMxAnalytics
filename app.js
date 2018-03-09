@@ -4,6 +4,8 @@ var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
 var path = require("path");
 var app = express();
+const showpadAccount = "biomerieux";
+
 let config;
 if (app.settings.env === "development") {
   config = require("./config.js"); // Get our config info (app id and app secret)
@@ -27,25 +29,14 @@ var DIST_DIR = path.join(__dirname, "dist");
 
 app.use(express.static(DIST_DIR)).use(cookieParser());
 
-// app.get("/schema", function(req, res) {
-//   res.sendfile(path.join(__dirname + "/public/schema_advanced.json"));
-// });
-
-// app.get("*", function(req, res) {
-//   res.sendFile(path.join(DIST_DIR, "index.html"));
-// });
-
 app.get("/login", function(req, res) {
   // your application requests authorization
   console.log("login attempt");
-  // var scope =
-  // "user-read-private user-read-email user-top-read playlist-read-private user-library-read";
   res.redirect(
-    "https://biomerieux.showpad.biz/api/v3/oauth2/authorize?" +
+    `https://${showpadAccount}.showpad.biz/api/v3/oauth2/authorize?` +
       querystring.stringify({
         response_type: "code",
         client_id: client_id,
-        // scope: scope,
         redirect_uri: redirect_uri
       })
   );
@@ -58,7 +49,7 @@ app.get("/callback", function(req, res) {
   console.log("code", code);
 
   const authOptions = {
-    url: "https://biomerieux.showpad.biz/api/v3/oauth2/token",
+    url: `https://${showpadAccount}.showpad.biz/api/v3/oauth2/token`,
     form: {
       code: code,
       redirect_uri: redirect_uri,
@@ -105,7 +96,7 @@ app.get("/refresh_token", function(req, res) {
   // requesting access token from refresh token
   var refresh_token = req.query.refresh_token;
   var authOptions = {
-    url: "https://accounts.spotify.com/api/token",
+    url: `https://${showpadAccount}.showpad.biz/api/v3/oauth2/token`,
     headers: {
       Authorization:
         "Basic " +
