@@ -15,14 +15,7 @@ import ShowpadWebApi from "./showpad-web-api";
 import { joinsEventsChannels, joinsEventsDivisions } from "./schema/joins";
 const dateFormat = "Y-MM-DD HH:mm:ss";
 let showpadRequestor;
-// class TestApi {
-//   fetchUsers(){
-//     return
-//   }
-// }
-//
-// const testApi = new TestApi()
-// testApi.fetchPeoples().
+
 const showpadAuthentication = new ShowpadAuthentication();
 
 (function() {
