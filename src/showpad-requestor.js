@@ -35,7 +35,9 @@ export default class ShowpadRequestor {
   }
 
   fetchEvents() {
-    return this.fetch("/exports/events.json");
+    return this.fetch(
+      "/exports/events.json?startedAt=2018-02-01&endedAt=2018-03-09&pageBased=true&limit=1000"
+    );
   }
 
   fetchUserUserGroups() {

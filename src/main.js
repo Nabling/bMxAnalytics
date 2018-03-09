@@ -119,7 +119,7 @@ const showpadAuthentication = new ShowpadAuthentication();
       assetsTable,
       channelsTable,
       divisionsTable,
-      // eventsTable,
+      eventsTable,
       userUsergroupsTable,
       usergroupsTable,
       usersTable
