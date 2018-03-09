@@ -10,6 +10,7 @@ import usergroupsSchema from "./schema/usergroups";
 import usersSchema from "./schema/users";
 import ShowpadRequestor from "./showpad-requestor";
 import ShowpadAuthentication from "./showpad-authentication";
+import ShowpadWebApi from "./showpad-web-api";
 import { joinsEventsChannels, joinsEventsDivisions } from "./schema/joins";
 const dateFormat = "Y-MM-DD HH:mm:ss";
 let showpadRequestor;
@@ -47,14 +48,14 @@ let showpadRequestor;
     console.log("Setting tableau.password to access_token and refresh tokens");
     tableau.password = JSON.stringify(ShowpadAuthentication.getTokens());
 
-    const s = new ShowpadWebApi();
-    s.accessToken = ShowpadAuthentication.getAccessToken();
-
-    showpadRequestor = new ShowpadRequestor(
-      s,
-      tableau.connectionData,
-      tableau.reportProgress
-    );
+    // const s = new ShowpadWebApi();
+    // s.accessToken = ShowpadAuthentication.getTokens().access_token;
+    //
+    // showpadRequestor = new ShowpadRequestor(
+    //   s,
+    //   tableau.connectionData,
+    //   tableau.reportProgress
+    // );
 
     console.log("Calling initCallback");
     initCallback();
