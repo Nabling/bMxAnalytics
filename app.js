@@ -2,9 +2,12 @@ var express = require("express"); // Express web server framework
 var request = require("request"); // "Request" library
 var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
-var config = require("./config.js"); // Get our config info (app id and app secret)
 var path = require("path");
-
+var app = express();
+let config;
+if (app.settings.env === "development") {
+  config = require("./config.js"); // Get our config info (app id and app secret)
+}
 var client_id =
   process.env.CLIENT_ID || process.env.APPSETTING_CLIENT_ID || config.CLIENT_ID; // Your client sid
 var client_secret =
@@ -19,7 +22,7 @@ var port = process.env.PORT || process.env.APPSETTING_PORT || config.PORT;
 console.log("client_id", client_id);
 console.log("redirect_uri", redirect_uri);
 
-var app = express();
+console.log("app.settings.env", app.settings.env);
 var DIST_DIR = path.join(__dirname, "dist");
 
 app.use(express.static(DIST_DIR)).use(cookieParser());
