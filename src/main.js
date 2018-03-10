@@ -154,6 +154,15 @@ const showpadAuthentication = new ShowpadAuthentication();
     let tableData = [];
     tableFunctions[table.tableInfo.id]
       .then(response => {
+        console.log("response", response);
+        console.log(
+          'response.headers["x-showpad-scroll-id"]',
+          response.headers["x-showpad-scroll-id"]
+        );
+        console.log(
+          'response.headers["X-Showpad-Scroll-Id"]',
+          response.headers["X-Showpad-Scroll-Id"]
+        );
         return response;
       })
       .then(response => response.data.response.items)
