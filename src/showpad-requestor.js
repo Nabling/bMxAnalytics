@@ -113,6 +113,12 @@ export default class ShowpadRequestor {
       ""
     )
       .then(response => {
+        this.reportProgress(
+          "Received data for Events. Retrieved " +
+            response.data.response.items.length +
+            " of " +
+            response.data.response.count
+        );
         return {
           data: response.data.response.items,
           headers: response.headers
