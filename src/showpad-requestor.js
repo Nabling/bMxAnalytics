@@ -9,7 +9,7 @@ class ShowpadRequestor {
     console.log("timeRange", timeRange);
     this.reportProgress = reportProgress || (() => {});
     console.log("this.endDate", this.endDate);
-    this.limit = 100;
+    this.limit = 1000;
     this.startedAt = "2018-03-09";
     this.endedAt = moment().format("YYYY-MM-DD");
     this.pageBased = "true";
@@ -32,6 +32,7 @@ class ShowpadRequestor {
         headers
       })
       .then(response => {
+        console.log("response", response);
         return {
           data: response.data.response.items,
           count: response.data.response.count,
