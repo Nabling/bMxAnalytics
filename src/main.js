@@ -129,13 +129,15 @@ const showpadAuthentication = new ShowpadAuthentication();
   myConnector.getData = function(table, doneCallback) {
     console.log("getData called for table " + table.tableInfo.id);
     const tableFunctions = {
-      assets: showpadRequestor.fetchAssets(),
-      channels: showpadRequestor.fetchChannels(),
-      divisions: showpadRequestor.fetchDivisions(),
-      events: showpadRequestor.fetchEvents(),
-      userUsergroups: showpadRequestor.fetchUserUserGroups(),
-      usergroups: showpadRequestor.fetchUserGroups(),
-      users: showpadRequestor.fetchUsers()
+      assets: showpadRequestor.fetchAssets.bind(showpadRequestor),
+      channels: showpadRequestor.fetchChannels.bind(showpadRequestor),
+      divisions: showpadRequestor.fetchDivisions.bind(showpadRequestor),
+      events: showpadRequestor.fetchEvents.bind(showpadRequestor),
+      userUsergroups: showpadRequestor.fetchUserUserGroups.bind(
+        showpadRequestor
+      ),
+      usergroups: showpadRequestor.fetchUserGroups.bind(showpadRequestor),
+      users: showpadRequestor.fetchUsers.bind(showpadRequestor)
     };
     if (!tableFunctions.hasOwnProperty(table.tableInfo.id)) {
       tableau.abortWithError("Unknown table ID: " + table.tableInfo.id);
@@ -152,84 +154,22 @@ const showpadAuthentication = new ShowpadAuthentication();
     }, []);
 
     let tableData = [];
-    tableFunctions[table.tableInfo.id]
-      // .then(response => {
-      //   console.log("response", response);
-      //   console.log(
-      //     'response.headers["x-showpad-scroll-id"]',
-      //     response.headers["x-showpad-scroll-id"]
-      //   );
-      //   console.log(
-      //     'response.headers["X-Showpad-Scroll-Id"]',
-      //     response.headers["X-Showpad-Scroll-Id"]
-      //   );
-      //   return response;
-      // })
-      // .then(response => response.data.response.items)
-      .then(data => {
-        console.log("data", data);
+    tableFunctions[table.tableInfo.id]().then(data => {
+      console.log("data", data);
 
-        data.forEach(item => {
-          dateTimeFields.forEach(dateTimeField => {
-            item[dateTimeField] = item[dateTimeField]
-              ? moment(item[dateTimeField]).format(dateFormat)
-              : "";
-          });
-          // console.log("item", item);
-          tableData.push(item);
+      data.forEach(item => {
+        dateTimeFields.forEach(dateTimeField => {
+          item[dateTimeField] = item[dateTimeField]
+            ? moment(item[dateTimeField]).format(dateFormat)
+            : "";
         });
-        table.appendRows(tableData);
-        doneCallback();
+        // console.log("item", item);
+        tableData.push(item);
       });
-
-    // axios
-    //   .get(showpadRequestor.showpadApi.buildUrl("/exports/users.json"), {
-    //     headers: {
-    //       Accept: "application/json",
-    //       Authorization: AuthStr
-    //     }
-    //   })
-    //   .then(response => response.data.response.items)
-    //   .then(data => {
-    //     // console.log("data", data);
-    //
-    //     data.forEach(item => {
-    //       dateTimeFields.forEach(dateTimeField => {
-    //         item[dateTimeField] = item[dateTimeField]
-    //           ? moment(item[dateTimeField]).format(dateFormat)
-    //           : "";
-    //       });
-    //       // console.log("item", item);
-    //       tableData.push(item);
-    //     });
-    //     console.log("tableData", tableData);
-    //     table.appendRows(tableData);
-    //     doneCallback();
-    //   });
+      table.appendRows(tableData);
+      doneCallback();
+    });
   };
-
-  // myConnector.getData = function(table, doneCallback) {
-  //   console.log("getData called for table " + table.tableInfo.id);
-  //   var tableFunctions = {
-  //     topArtists: showpadRequestor.getMyTopArtists.bind(showpadRequestor),
-  //     topTracks: showpadRequestor.getMyTopTracks.bind(showpadRequestor),
-  //     artists: showpadRequestor.getMySavedArtists.bind(showpadRequestor),
-  //     albums: showpadRequestor.getMySavedAlbums.bind(showpadRequestor),
-  //     tracks: showpadRequestor.getMySavedTracks.bind(showpadRequestor)
-  //   };
-  //
-  //   tableFunctions[table.tableInfo.id]().then(
-  //     function(rows) {
-  //       table.appendRows(rows);
-  //       doneCallback();
-  //     },
-  //     function(error) {
-  //       console.log("Error occured waiting for promises. Aborting");
-  //       tableau.abortWithError(error.toString());
-  //       doneCallback();
-  //     }
-  //   );
-  // };
 
   tableau.registerConnector(myConnector);
 
