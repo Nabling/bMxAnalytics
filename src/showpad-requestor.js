@@ -3,21 +3,22 @@ import moment from "moment";
 import querystring from "querystring";
 
 class ShowpadRequestor {
-  constructor(showpadApi, timeRange, reportProgress) {
-    this.showpadApi = showpadApi;
+  constructor(token, timeRange, reportProgress) {
+    this.baseUri = "/proxy";
+    this.token = token;
     this.timeRange = timeRange;
     console.log("timeRange", timeRange);
     this.reportProgress = reportProgress || (() => {});
-    console.log("this.endDate", this.endDate);
     this.limit = 1000;
-    this.startedAt = "2018-03-09";
+    this.startedAt = "2018-03-21";
     this.endedAt = moment().format("YYYY-MM-DD");
     this.pageBased = "true";
+    this.nbEvents = 0;
   }
 
   fetch(endpoint, scrollId = "") {
-    console.log("this is fetch of ", endpoint);
-    const Authorization = "Bearer " + this.showpadApi.accessToken;
+    const Authorization = "Bearer " + this.token;
+    console.log("Authorization", Authorization);
     const headers = {
       Authorization,
       Accept: "application/json"
@@ -28,11 +29,10 @@ class ShowpadRequestor {
     }
 
     const request = axios
-      .get(this.showpadApi.buildUrl(endpoint), {
+      .get(this.buildUrl(endpoint), {
         headers
       })
       .then(response => {
-        console.log("response", response);
         return {
           data: response.data.response.items,
           count: response.data.response.count,
@@ -43,26 +43,29 @@ class ShowpadRequestor {
     return request;
   }
 
-  fetchEvents() {
-    const q = `/exports/events.json?startedAt=2018-03-09&endedAt=${
-      this.endDate
-    }&pageBased=true&limit=1000`;
+  fetchEvents(scrollId = "") {
+    console.log("lastEvent", this.lastEvent);
+
     const { startedAt, endedAt, pageBased, limit } = this;
+
     const url =
       "/exports/events.json?" +
       querystring.stringify({ startedAt, endedAt, pageBased, limit });
 
-    return this.fetch(url).then(({ data, count, headers }) => {
+    return this.fetch(url, scrollId).then(({ data, count, headers }) => {
+      this.nbEvents += data.length;
       this.reportProgress(
-        "Received data for Events. Retrieved " + data.length + " of " + count
+        "Fetching events : " + this.nbEvents + " of " + count
       );
 
-      console.log("response headers", headers);
-
-      if (data.length > 0 && headers["X-Showpad-Scroll-Id"]) {
-        return data.push(this.fetch(url, headers["X-Showpad-Scroll-Id"]));
+      if (data.length > 0 && headers["x-showpad-scroll-id"]) {
+        return this.fetchEvents(headers["x-showpad-scroll-id"]).then(
+          newData => {
+            return data.concat(newData);
+          }
+        );
       } else {
-        return data;
+        return [];
       }
     });
   }
@@ -101,6 +104,14 @@ class ShowpadRequestor {
     return this.fetch("/exports/usergroups.json").then(({ data }) => {
       return data;
     });
+  }
+
+  buildUrl(endpoint) {
+    return this.baseUri + endpoint;
+  }
+
+  set lastEvent(date) {
+    this.lastEvent = date;
   }
 }
 

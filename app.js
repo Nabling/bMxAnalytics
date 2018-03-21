@@ -4,7 +4,6 @@ var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
 var path = require("path");
 var app = express();
-const showpadAccount = "biomerieux";
 
 let config;
 if (app.settings.env === "development") {
@@ -21,6 +20,9 @@ var redirect_uri =
   process.env.APPSETTING_REDIRECT_URI ||
   config.REDIRECT_URI; // Your redirect uri
 var port = process.env.PORT || process.env.APPSETTING_PORT || config.PORT;
+const showpadAccount = process.env.SHOWPAD_ACCOUNT || "biomerieux";
+const baseUri = `https://${showpadAccount}.showpad.biz/api/v3`;
+
 console.log("client_id", client_id);
 console.log("redirect_uri", redirect_uri);
 
@@ -29,11 +31,18 @@ var DIST_DIR = path.join(__dirname, "dist");
 
 app.use(express.static(DIST_DIR)).use(cookieParser());
 
+app.get("/proxy/*", function(req, res) {
+  const endpoint = req.url.replace("/proxy", "");
+  console.log("baseUri + endpoint", baseUri + endpoint);
+  req.pipe(request(baseUri + endpoint)).pipe(res);
+});
+
 app.get("/login", function(req, res) {
   // your application requests authorization
   console.log("login attempt");
+
   res.redirect(
-    `https://${showpadAccount}.showpad.biz/api/v3/oauth2/authorize?` +
+    `${baseUri}/oauth2/authorize?` +
       querystring.stringify({
         response_type: "code",
         client_id: client_id,
@@ -49,7 +58,7 @@ app.get("/callback", function(req, res) {
   console.log("code", code);
 
   const authOptions = {
-    url: `https://${showpadAccount}.showpad.biz/api/v3/oauth2/token`,
+    url: `${baseUri}/oauth2/token`,
     form: {
       code: code,
       redirect_uri: redirect_uri,
@@ -96,7 +105,7 @@ app.get("/refresh_token", function(req, res) {
   // requesting access token from refresh token
   var refresh_token = req.query.refresh_token;
   var authOptions = {
-    url: `https://${showpadAccount}.showpad.biz/api/v3/oauth2/token`,
+    url: `${baseUri}/oauth2/token`,
     headers: {
       Authorization:
         "Basic " +

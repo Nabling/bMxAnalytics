@@ -11,7 +11,7 @@ import usergroupsSchema from "./schema/usergroups";
 import usersSchema from "./schema/users";
 import ShowpadRequestor from "./showpad-requestor";
 import ShowpadAuthentication from "./showpad-authentication";
-import ShowpadWebApi from "./showpad-web-api";
+// import ShowpadWebApi from "./showpad-web-api";
 import { joinsEventsChannels, joinsEventsDivisions } from "./schema/joins";
 const dateFormat = "Y-MM-DD HH:mm:ss";
 let showpadRequestor;
@@ -54,11 +54,11 @@ const showpadAuthentication = new ShowpadAuthentication();
       "showpadAuthentication.getTokens()",
       showpadAuthentication.getTokens()
     );
-    const showpadApi = new ShowpadWebApi("biomerieux");
-    showpadApi.accessToken = showpadAuthentication.getTokens().access_token;
+    // const showpadApi = new ShowpadWebApi("biomerieux");
+    const accessToken = showpadAuthentication.getTokens().access_token;
 
     showpadRequestor = new ShowpadRequestor(
-      showpadApi,
+      accessToken,
       tableau.connectionData,
       tableau.reportProgress
     );
@@ -94,7 +94,8 @@ const showpadAuthentication = new ShowpadAuthentication();
     const eventsTable = {
       id: "events",
       alias: "events",
-      columns: eventsSchema
+      columns: eventsSchema,
+      incrementColumnId: "startTime"
     };
 
     const userUsergroupsTable = {
@@ -128,6 +129,8 @@ const showpadAuthentication = new ShowpadAuthentication();
 
   myConnector.getData = function(table, doneCallback) {
     console.log("getData called for table " + table.tableInfo.id);
+    // showpadRequestor.lastEvent = new Date(table.incrementValue || "01-01-2018");
+
     const tableFunctions = {
       assets: showpadRequestor.fetchAssets.bind(showpadRequestor),
       channels: showpadRequestor.fetchChannels.bind(showpadRequestor),
@@ -163,7 +166,6 @@ const showpadAuthentication = new ShowpadAuthentication();
             ? moment(item[dateTimeField]).format(dateFormat)
             : "";
         });
-        // console.log("item", item);
         tableData.push(item);
       });
       table.appendRows(tableData);

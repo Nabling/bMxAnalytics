@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/Cellar/node/9.7.1_1/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js install
+  /usr/local/Cellar/node/9.7.1_1/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js start
 
 PATH: 
   /Users/geraldinerichard/.rbenv/shims:/usr/local/opt/qt@5.5/bin:./bin:/Users/geraldinerichard/.rbenv/shims:/usr/local/opt/rbenv/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin
@@ -5837,9 +5837,9 @@ Lockfile:
 
 Trace: 
   Error: Command failed.
-  Exit code: 2
+  Exit code: 1
   Command: sh
-  Arguments: -c webpack --mode production
+  Arguments: -c node app.js
   Directory: /Users/geraldinerichard/code/freelance/timothee/biomerieux/bMxAnalytics
   Output:
   
