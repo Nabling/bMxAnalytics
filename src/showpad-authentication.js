@@ -1,36 +1,21 @@
 import axios from "axios";
 // Helper object which abstracts away most of the authentication related connector functionality
 class ShowpadAuthentication {
-  // Obtains parameters from the hash of the URL
-  _getHashParams() {
-    var hashParams = {};
-    var e,
-      r = /([^&;=]+)=?([^&;]*)/g,
-      q = window.location.hash.substring(1);
-    while ((e = r.exec(q))) {
-      hashParams[e[1]] = decodeURIComponent(e[2]);
-    }
-    return hashParams;
-  }
-
   // Checks whether or not we have saved authentication tokens available
   hasTokens() {
     console.log("Checking if we have auth tokens");
-    var result = this.getTokens();
-    return !!result.access_token && !!result.refresh_token;
+    const tokens = this.getTokens();
+    return !!tokens.access_token && !!tokens.refresh_token;
   }
 
   // Gets the access_token and refresh_token from either tableau.password or query hash
   getTokens() {
-    var result = {};
+    let result = {};
 
     // We've saved off the access & refresh token to tableau.password
     if (tableau.password) {
       console.log("Grabbing authentication from tableau.password");
       result = JSON.parse(tableau.password);
-    } else {
-      console.log("Grabbing authentication from query hash");
-      result = this._getHashParams();
     }
 
     return result;
