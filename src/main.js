@@ -132,6 +132,7 @@ const showpadAuthentication = new ShowpadAuthentication();
       console.log("table.tableInfo", table.tableInfo);
       const date = new Date(table.incrementValue || startDateTime);
       showpadRequestor.lastEvent = date;
+      showpadRequestor.reset();
     }
 
     const tableFunctions = {

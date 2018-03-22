@@ -54,9 +54,9 @@ class ShowpadRequestor {
     return this.fetch(url, scrollId)
       .then(({ data, count, headers }) => {
         this.nbEvents += data.length;
-        // this.reportProgress(
-        //   "Fetching events : " + this.nbEvents + " of " + count
-        // );
+        this.reportProgress(
+          "Fetching events : " + this.nbEvents + " of " + count
+        );
 
         if (data.length === this.limit) {
           // The response contains some data and a scrollId
@@ -117,6 +117,10 @@ class ShowpadRequestor {
   set lastEvent(date) {
     this.incrementDate = date;
     this.startedAt = moment(date).format("YYYY-MM-DD");
+  }
+
+  reset() {
+    this.nbEvents = 0;
   }
 }
 
