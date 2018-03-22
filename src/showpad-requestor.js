@@ -63,7 +63,9 @@ class ShowpadRequestor {
         };
       })
       .catch(error => {
-        console.log("error not authorized", error);
+        console.log("error in catch", error);
+        tableau.log("error in catch", error);
+
         if (params.hasOwnProperty("token")) {
           tableau.abortWithError(error);
           const error = new Error(error);
