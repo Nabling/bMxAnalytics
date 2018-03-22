@@ -38,7 +38,7 @@ class ShowpadAuthentication {
 
   // Gets just the access token needed for making requests
   getAccessToken() {
-    return this.getTokens().access_token + "123";
+    return this.getTokens().access_token;
   }
 
   getRefreshToken() {
@@ -47,17 +47,6 @@ class ShowpadAuthentication {
 
   // Note: Refresh tokens are valid forever, just need to get a new access token.
   // Refresh tokens can me manually revoked but won"t expire
-  // refreshToken(doneHandler) {
-  //   console.log("Requesting refreshToken");
-  //   return $.ajax({
-  //     url: "/refresh_token",
-  //     data: {
-  //       refresh_token: refresh_token
-  //     }
-  //   }).done(function(data) {
-  //     doneHandler(data.access_token);
-  //   });
-  // }
 
   refreshToken() {
     console.log("Requesting refreshToken");
