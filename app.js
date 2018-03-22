@@ -126,6 +126,10 @@ app.get("/refresh_token", function(req, res) {
       res.send({
         access_token: access_token
       });
+    } else {
+      res
+        .status(response.statusCode)
+        .send({ error: "Something failed!" + error });
     }
   });
 });
