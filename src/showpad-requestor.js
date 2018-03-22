@@ -64,14 +64,20 @@ class ShowpadRequestor {
       })
       .catch(error => {
         console.log("error not authorized", error);
-        return this.showpadAuthentication.refreshToken().then(token => {
-          console.log("token", token);
-          tableau.password = JSON.stringify({
-            access_token: token,
-            refresh_token: this.showpadAuthentication.getRefreshToken()
+        if (params.hasOwnProperty("token")) {
+          tableau.abortWithError(error);
+          const error = new Error(error);
+          throw error;
+        } else {
+          return this.showpadAuthentication.refreshToken().then(token => {
+            console.log("token", token);
+            tableau.password = JSON.stringify({
+              access_token: token,
+              refresh_token: this.showpadAuthentication.getRefreshToken()
+            });
+            return this.fetch(endpoint, { token });
           });
-          return this.fetch(endpoint, { token });
-        });
+        }
       });
 
     return request;
