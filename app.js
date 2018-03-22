@@ -32,6 +32,7 @@ var DIST_DIR = path.join(__dirname, "dist");
 app.use(express.static(DIST_DIR)).use(cookieParser());
 
 app.get("/proxy/*", function(req, res) {
+  console.log("proxy called");
   const endpoint = req.url.replace("/proxy", "");
   console.log("baseUri + endpoint", baseUri + endpoint);
   req.pipe(request(baseUri + endpoint)).pipe(res);
@@ -103,6 +104,7 @@ app.get("/callback", function(req, res) {
 
 app.get("/refresh_token", function(req, res) {
   // requesting access token from refresh token
+  console.log("request refresh token", req.query.refresh_token);
   var refresh_token = req.query.refresh_token;
   var authOptions = {
     url: `${baseUri}/oauth2/token`,
