@@ -1,6 +1,5 @@
 require("file-loader?name=index.html!./index.html");
 import moment from "moment";
-import axios from "axios";
 
 import assetsSchema from "./schema/assets";
 import channelsSchema from "./schema/channels";
@@ -49,17 +48,12 @@ const showpadAuthentication = new ShowpadAuthentication();
 
     // STEP 6 - TOKEN STORED IN TABLEAU PASSWORD
     console.log("Setting tableau.password to access_token and refresh tokens");
+
     tableau.password = JSON.stringify(showpadAuthentication.getTokens());
-    console.log(
-      "showpadAuthentication.getTokens()",
-      showpadAuthentication.getTokens()
-    );
-    // const showpadApi = new ShowpadWebApi("biomerieux");
-    const accessToken = showpadAuthentication.getTokens().access_token;
 
     showpadRequestor = new ShowpadRequestor(
-      accessToken,
-      tableau.connectionData,
+      showpadAuthentication.getAccessToken(),
+      showpadAuthentication,
       tableau.reportProgress
     );
 
@@ -177,6 +171,10 @@ const showpadAuthentication = new ShowpadAuthentication();
       table.appendRows(tableData);
       doneCallback();
     });
+    // .catch(err => {
+    //   // console.log("err", err);
+    //   doneCallback();
+    // });
   };
 
   tableau.registerConnector(myConnector);

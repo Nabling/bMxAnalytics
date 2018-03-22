@@ -1,3 +1,4 @@
+import axios from "axios";
 // Helper object which abstracts away most of the authentication related connector functionality
 class ShowpadAuthentication {
   // Obtains parameters from the hash of the URL
@@ -37,20 +38,37 @@ class ShowpadAuthentication {
 
   // Gets just the access token needed for making requests
   getAccessToken() {
-    return this.getTokens().access_token;
+    return this.getTokens().access_token + "123";
+  }
+
+  getRefreshToken() {
+    return this.getTokens().refresh_token;
   }
 
   // Note: Refresh tokens are valid forever, just need to get a new access token.
   // Refresh tokens can me manually revoked but won"t expire
-  refreshToken(doneHandler) {
+  // refreshToken(doneHandler) {
+  //   console.log("Requesting refreshToken");
+  //   return $.ajax({
+  //     url: "/refresh_token",
+  //     data: {
+  //       refresh_token: refresh_token
+  //     }
+  //   }).done(function(data) {
+  //     doneHandler(data.access_token);
+  //   });
+  // }
+
+  refreshToken() {
     console.log("Requesting refreshToken");
-    return $.ajax({
+    return axios({
       url: "/refresh_token",
-      data: {
-        refresh_token: refresh_token
+      params: {
+        refresh_token: this.getRefreshToken()
       }
-    }).done(function(data) {
-      doneHandler(data.access_token);
+    }).then(response => {
+      console.log("response", response);
+      return response.data.access_token;
     });
   }
 }
