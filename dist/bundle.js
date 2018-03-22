@@ -5619,7 +5619,7 @@ eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nvar dateFormat = exports.dateFormat = \"Y-MM-DD HH:mm:ss\";\nvar startDateTime = exports.startDateTime = \"2018-03-22 11:05:21\";\n// export const startDateTime = \"2018-03-01\";\n\n//# sourceURL=webpack:///./settings.js?");
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nvar dateFormat = exports.dateFormat = \"Y-MM-DD HH:mm:ss\";\n// export const startDateTime = \"2018-03-22 11:05:21\";\nvar startDateTime = exports.startDateTime = \"2018-03-10\";\n\n//# sourceURL=webpack:///./settings.js?");
 
 /***/ }),
 
