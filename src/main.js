@@ -11,9 +11,9 @@ import usergroupsSchema from "./schema/usergroups";
 import usersSchema from "./schema/users";
 import ShowpadRequestor from "./showpad-requestor";
 import ShowpadAuthentication from "./showpad-authentication";
-// import ShowpadWebApi from "./showpad-web-api";
 import { joinsEventsChannels, joinsEventsDivisions } from "./schema/joins";
-const dateFormat = "Y-MM-DD HH:mm:ss";
+import { dateFormat, startDateTime } from "./settings";
+
 let showpadRequestor;
 
 const showpadAuthentication = new ShowpadAuthentication();
@@ -128,8 +128,11 @@ const showpadAuthentication = new ShowpadAuthentication();
   };
 
   myConnector.getData = function(table, doneCallback) {
-    console.log("getData called for table " + table.tableInfo.id);
-    // showpadRequestor.lastEvent = new Date(table.incrementValue || "01-01-2018");
+    if (table.tableInfo.hasOwnProperty("incrementColumnId")) {
+      console.log("table.tableInfo", table.tableInfo);
+      const date = new Date(table.incrementValue || startDateTime);
+      showpadRequestor.lastEvent = date;
+    }
 
     const tableFunctions = {
       assets: showpadRequestor.fetchAssets.bind(showpadRequestor),
@@ -156,11 +159,13 @@ const showpadAuthentication = new ShowpadAuthentication();
       return fields;
     }, []);
 
+    // console.log("columns", table.tableInfo.columns);
+
     let tableData = [];
     tableFunctions[table.tableInfo.id]().then(data => {
+      // data = data.slice(-100);
       console.log("data", data);
-
-      data.forEach(item => {
+      data.forEach((item, index) => {
         dateTimeFields.forEach(dateTimeField => {
           item[dateTimeField] = item[dateTimeField]
             ? moment(item[dateTimeField]).format(dateFormat)
@@ -185,6 +190,7 @@ const showpadAuthentication = new ShowpadAuthentication();
       // tableau.submit();
       setupConnector();
     });
+    // setupConnector();
   });
 
   // $(document).ready(function() {
