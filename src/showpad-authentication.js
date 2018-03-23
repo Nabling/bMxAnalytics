@@ -2,16 +2,10 @@ import axios from "axios";
 // Helper object which abstracts away most of the authentication related connector functionality
 class ShowpadAuthentication {
   // Checks whether or not we have saved authentication tokens available
-  // hasTokens() {
-  //   console.log("Checking if we have auth tokens");
-  //   const tokens = this.getTokens();
-  //   return !!tokens.access_token && !!tokens.refresh_token;
-  // }
-
   hasTokens() {
     console.log("Checking if we have auth tokens");
-    var result = this.getTokens();
-    return !!result.access_token && !!result.refresh_token;
+    const tokens = this.getTokens();
+    return !!tokens.access_token && !!tokens.refresh_token;
   }
 
   // Gets the access_token and refresh_token from either tableau.password or query hash

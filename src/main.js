@@ -22,10 +22,7 @@ const showpadAuthentication = new ShowpadAuthentication();
   // const showpadRequestor = new ShowpadRequestor();
   myConnector.init = function(initCallback) {
     console.log("Initializing Web Data Connector. Phase is " + tableau.phase);
-    console.log(
-      "showpadAuthentication.hasTokens()",
-      showpadAuthentication.getTokens()
-    );
+
     // STEP 1 - WDC IS LOADED
     if (!showpadAuthentication.hasTokens()) {
       console.log("We do not have showpadAuthentication tokens available");
