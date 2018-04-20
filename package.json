@@ -2,7 +2,8 @@
   "author": "Nabling",
   "name": "ShowpadWDC",
   "description": "Showpad Web Data Connector for Tableau",
-  "version": "0.0.1",
+  "version": "1.0",
+  "license": "Private",
   "dependencies": {
     "axios": "^0.18.0",
     "babel-loader": "^7.1.4",
